@@ -26,12 +26,14 @@ export default function appSrc(express, bodyParser, createReadStream, crypto, ht
     res.send(hash);
   });
 
-  app.get('/req/', (req, res) => {
-    const addr = req.query.addr;
+  const handleReq = (req, res) => {
+    const addr = req.method === 'GET' ? req.query.addr : req.body.addr;
+    
     if (!addr) {
       res.status(400).send('addr parameter required');
       return;
     }
+    
     http.get(addr, (response) => {
       let data = '';
       response.on('data', (chunk) => {
@@ -43,26 +45,10 @@ export default function appSrc(express, bodyParser, createReadStream, crypto, ht
     }).on('error', () => {
       res.status(500).send('Error fetching resource');
     });
-  });
+  };
 
-  app.post('/req/', (req, res) => {
-    const addr = req.body.addr;
-    if (!addr) {
-      res.status(400).send('addr parameter required');
-      return;
-    }
-    http.get(addr, (response) => {
-      let data = '';
-      response.on('data', (chunk) => {
-        data += chunk;
-      });
-      response.on('end', () => {
-        res.send(data);
-      });
-    }).on('error', () => {
-      res.status(500).send('Error fetching resource');
-    });
-  });
+  app.get('/req/', handleReq);
+  app.post('/req/', handleReq);
 
   app.all('*', (req, res) => {
     res.send('lisakorolkova');
