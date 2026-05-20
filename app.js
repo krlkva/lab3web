@@ -4,6 +4,13 @@ export default function appSrc(express, bodyParser, createReadStream, crypto, ht
   app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,OPTIONS,DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, ngrok-skip-browser-warning');
+    
+    if (req.method === 'OPTIONS') {
+      res.status(204).send();
+      return;
+    }
+    
     next();
   });
 
